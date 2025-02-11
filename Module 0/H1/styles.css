@@ -1,0 +1,18 @@
+body {
+    background-color: white;
+    color: black;
+    font-family: Arial, sans-serif;
+}
+
+a {
+    color: blue;
+}
+
+body.dark-theme {
+    background-color: #333;
+    color: white;
+}
+
+a.dark-theme {
+    color: lightblue;
+}

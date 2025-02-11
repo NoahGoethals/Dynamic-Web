@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Begroeting Button</title>
+</head>
+<body>
+    <button id="greetingButton">Hallo!</button>
+
+    <script>
+        document.querySelector('#greetingButton').addEventListener('click', function() {
+            if (this.textContent === 'Hallo!') {
+                this.textContent = 'Tot ziens!';
+            } else {
+                this.textContent = 'Hallo!';
+            }
+        });
+    </script>
+</body>
+</html>
