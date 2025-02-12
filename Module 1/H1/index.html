@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Menu Builder</title>
+    <style>
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        nav li {
+            margin: 5px 0;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: black;
+            font-weight: bold;
+        }
+
+
+        .submenu {
+            display: none;
+            margin-left: 20px;
+            font-weight: normal;
+        }
+
+        .submenu.visible {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <nav id="mainMenu"></nav>
+    <div class="content">
+        <h1 id="hoofdstuk1">Hoofdstuk 1</h1>
+        <h2 id="deel1-1">Deel 1.1</h2>
+        <h2 id="deel1-2">Deel 1.2</h2>
+        <h1 id="hoofdstuk2">Hoofdstuk 2</h1>
+        <h2 id="deel2-1">Deel 2.1</h2>
+    </div>
+
+    <script>
+        'use strict';
+
+        // Selecteer het menu en alle h1 en h2 elementen
+        let menu = document.getElementById('mainMenu');
+        let hoofdstukken = document.getElementsByTagName('h1');
+        let delen = document.getElementsByTagName('h2');
+
+        // Maak een ul voor het menu
+        let menuList = document.createElement('ul');
+
+        // Loop door alle hoofdstukken
+        for (let i = 0; i < hoofdstukken.length; i++) {
+            let hoofdstuk = hoofdstukken[i];
+
+            // Maak een lijstitem en link voor het hoofdstuk
+            let hoofdstukItem = document.createElement('li');
+            let hoofdstukLink = document.createElement('a');
+            hoofdstukLink.href = '#' + hoofdstuk.id;
+            hoofdstukLink.textContent = hoofdstuk.textContent;
+
+            // Voeg klik event toe om submenu te tonen
+            hoofdstukLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                let submenu = hoofdstukItem.querySelector('.submenu');
+                submenu.classList.toggle('visible');
+                document.getElementById(hoofdstuk.id).scrollIntoView({ behavior: 'smooth' });
+            });
+
+            hoofdstukItem.appendChild(hoofdstukLink);
+
+            // Maak een submenu voor de delen
+            let submenu = document.createElement('ul');
+            submenu.classList.add('submenu');
+
+            // Voeg de juiste delen toe aan het submenu
+            let volgendeElement = hoofdstuk.nextElementSibling;
+            while (volgendeElement && volgendeElement.tagName === 'H2') {
+                let deelItem = document.createElement('li');
+                let deelLink = document.createElement('a');
+                deelLink.href = '#' + volgendeElement.id;
+                deelLink.textContent = volgendeElement.textContent;
+
+                // Voeg klik event toe voor delen
+                deelLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.getElementById(volgendeElement.id).scrollIntoView({ behavior: 'smooth' });
+                });
+
+                deelItem.appendChild(deelLink);
+                submenu.appendChild(deelItem);
+                volgendeElement = volgendeElement.nextElementSibling;
+            }
+
+            hoofdstukItem.appendChild(submenu);
+            menuList.appendChild(hoofdstukItem);
+        }
+
+        menu.appendChild(menuList);
+    </script>
+</body>
+</html>
