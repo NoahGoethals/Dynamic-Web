@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Winkelwagen</title>
+    <script src="index.mjs" type="module"></script>
+</head>
+<body>
+
+    <div id="shoppingCart">
+        <div id="addProduct">
+            <input type="text" id="productName" placeholder="Product naam">
+            <input type="number" id="productPrice" placeholder="Prijs">
+            <button id="addToCart">Voeg toe aan winkelwagen</button>
+        </div>
+
+        <div id="cartControls">
+            <button id="sortByPrice">Sorteer op prijs</button>
+            <p>Totaal: €<span id="total">0.00</span></p>
+        </div>
+
+        <ul id="cartItems"></ul>
+    </div>
+
+</body>
+</html>
