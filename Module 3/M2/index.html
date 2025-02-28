@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Score Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        input {
+            padding: 10px;
+            margin: 5px;
+        }
+        button {
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        #scoreBoard {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            display: inline-block;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Game Score Tracker</h1>
+    <div>
+        <input type="text" id="playerName" placeholder="Speler naam">
+        <input type="number" id="score" placeholder="Score">
+        <button onclick="voegScoreToe()">Voeg Score Toe</button>
+    </div>
+    
+    <div id="scoreBoard">
+        <h2>Scoreboard</h2>
+        <ul id="scoreList"></ul>
+    </div>
+
+    <script>
+        const verwerkScore = (naam = "Onbekend", score = 0) => {
+            // Zorg dat de score een geldig getal is
+            const geldigeScore = !isNaN(score) && score !== "";
+            const geldigeNaam = naam.trim() !== "";
+
+            return geldigeScore && geldigeNaam 
+                ? { naam, score: Number(score), tijd: new Date().toLocaleTimeString() } 
+                : null;
+        };
+
+        const voegScoreToe = () => {
+            const naam = document.getElementById("playerName").value;
+            const score = document.getElementById("score").value;
+
+            const scoreObject = verwerkScore(naam, score);
+
+            if (scoreObject) {
+                const scoreList = document.getElementById("scoreList");
+                const nieuweScore = document.createElement("li");
+                nieuweScore.textContent = `${scoreObject.naam}: ${scoreObject.score} punten (${scoreObject.tijd})`;
+                scoreList.appendChild(nieuweScore);
+
+                // Inputvelden resetten na toevoegen
+                document.getElementById("playerName").value = "";
+                document.getElementById("score").value = "";
+            } else {
+                alert("Ongeldige invoer. Zorg dat de naam is ingevuld en de score een geldig nummer is.");
+            }
+        };
+    </script>
+
+</body>
+</html>
