@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Inventaris</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        #output { white-space: pre-line; margin-bottom: 20px; }
+        button { margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Product Inventaris</h1>
+    <div id="output"></div>
+
+    <button onclick="wijzigPrijs(0, 50)">Verlaag prijs Laptop (-€50)</button>
+    <button onclick="wijzigVoorraad(0, -1)">Verlaag voorraad Laptop (-1)</button>
+    <br>
+    <button onclick="wijzigPrijs(1, 5)">Verlaag prijs Muis (-€5)</button>
+    <button onclick="wijzigVoorraad(1, -1)">Verlaag voorraad Muis (-1)</button>
+    <br>
+    <button onclick="wijzigPrijs(2, 20)">Verlaag prijs Monitor (-€20)</button>
+    <button onclick="wijzigVoorraad(2, -1)">Verlaag voorraad Monitor (-1)</button>
+
+    <script>
+        class Product {
+            constructor(naam, prijs, voorraad) {
+                this.naam = naam;
+                this._prijs = prijs < 0 ? 0 : prijs;
+                this._voorraad = voorraad < 0 ? 0 : voorraad;
+            }
+
+            set prijs(value) {
+                this._prijs = value < 0 ? 0 : value;
+            }
+
+            get prijs() {
+                return this._prijs;
+            }
+
+            set voorraad(value) {
+                this._voorraad = value < 0 ? 0 : value;
+            }
+
+            get voorraad() {
+                return this._voorraad;
+            }
+
+            get verkoopprijs() {
+                return (this._prijs * 1.21).toFixed(2);
+            }
+
+            get beschikbaar() {
+                return this._voorraad > 0;
+            }
+
+            toonInfo() {
+                return `${this.naam}\nPrijs: €${this.prijs}\nVerkoopprijs: €${this.verkoopprijs}\nVoorraad: ${this.voorraad}\nBeschikbaar: ${this.beschikbaar ? 'Ja' : 'Nee'}`;
+            }
+        }
+
+        let producten = [
+            new Product("Laptop", 999, 5),
+            new Product("Muis", 25, 2),
+            new Product("Monitor", 199, 10)
+        ];
+
+        function toonInventaris() {
+            document.getElementById("output").innerText = producten.map(p => p.toonInfo()).join("\n\n");
+        }
+
+        function wijzigPrijs(index, bedrag) {
+            producten[index].prijs -= bedrag;
+            toonInventaris();
+        }
+
+        function wijzigVoorraad(index, aantal) {
+            producten[index].voorraad += aantal;
+            toonInventaris();
+        }
+
+        toonInventaris();
+    </script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voertuig Verhuur Systeem</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid black; padding: 10px; text-align: center; }
+        button { padding: 5px 10px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Voertuig Verhuur Systeem</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Merk</th>
+                <th>Model</th>
+                <th>Jaar</th>
+                <th>Verhuurprijs</th>
+                <th>Type</th>
+                <th>Extra Info</th>
+                <th>Beschikbaar</th>
+                <th>Actie</th>
+            </tr>
+        </thead>
+        <tbody id="voertuigTabel"></tbody>
+    </table>
+
+    <div id="output"></div>
+
+    <script>
+        class Voertuig {
+            constructor(merk, model, jaar, verhuurPrijs) {
+                this.merk = merk;
+                this.model = model;
+                this.jaar = jaar;
+                this.verhuurPrijs = verhuurPrijs;
+                this.beschikbaar = true;
+            }
+
+            verhuur = () => {
+                if (!this.beschikbaar) return `${this.merk} ${this.model} is al verhuurd!`;
+                this.beschikbaar = false;
+                return `${this.merk} ${this.model} is succesvol verhuurd voor €${this.verhuurPrijs} per dag.`;
+            };
+
+            retourneer = () => {
+                if (this.beschikbaar) return `${this.merk} ${this.model} is al beschikbaar!`;
+                this.beschikbaar = true;
+                return `${this.merk} ${this.model} is succesvol teruggebracht.`;
+            };
+        }
+
+        class Auto extends Voertuig {
+            constructor(merk, model, jaar, verhuurPrijs, aantalDeuren, brandstofType) {
+                super(merk, model, jaar, verhuurPrijs);
+                this.aantalDeuren = aantalDeuren;
+                this.brandstofType = brandstofType;
+            }
+
+            verhuur = () => `${super.verhuur()} Dit voertuig heeft ${this.aantalDeuren} deuren en rijdt op ${this.brandstofType}.`;
+        }
+
+        class Motor extends Voertuig {
+            constructor(merk, model, jaar, verhuurPrijs, cilinderinhoud, type) {
+                super(merk, model, jaar, verhuurPrijs);
+                this.cilinderinhoud = cilinderinhoud;
+                this.type = type;
+            }
+
+            verhuur = () => `${super.verhuur()} Dit is een ${this.type} motor met ${this.cilinderinhoud}cc cilinderinhoud.`;
+        }
+
+        let voertuigen = [
+            new Auto("Volkswagen", "Golf", 2020, 50, 5, "Benzine"),
+            new Auto("Tesla", "Model 3", 2022, 80, 4, "Elektrisch"),
+            new Motor("Yamaha", "R1", 2021, 70, 998, "Sport"),
+            new Motor("Harley-Davidson", "Street Glide", 2019, 60, 1746, "Tour"),
+        ];
+
+        const updateTabel = () => {
+            let tbody = document.getElementById("voertuigTabel");
+            tbody.innerHTML = "";
+            voertuigen.forEach((voertuig, index) => {
+                let row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${voertuig.merk}</td>
+                    <td>${voertuig.model}</td>
+                    <td>${voertuig.jaar}</td>
+                    <td>€${voertuig.verhuurPrijs}/dag</td>
+                    <td>${voertuig instanceof Auto ? "Auto" : "Motor"}</td>
+                    <td>${voertuig instanceof Auto ? `${voertuig.aantalDeuren} deuren, ${voertuig.brandstofType}` : `${voertuig.cilinderinhoud}cc, ${voertuig.type}`}</td>
+                    <td>${voertuig.beschikbaar ? "✅ Ja" : "❌ Nee"}</td>
+                    <td>
+                        <button onclick="verhuurVoertuig(${index})" ${!voertuig.beschikbaar ? "disabled" : ""}>Verhuur</button>
+                        <button onclick="retourneerVoertuig(${index})" ${voertuig.beschikbaar ? "disabled" : ""}>Retourneer</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        };
+
+        const verhuurVoertuig = index => {
+            let bericht = voertuigen[index].verhuur();
+            document.getElementById("output").innerText = bericht;
+            updateTabel();
+        };
+
+        const retourneerVoertuig = index => {
+            let bericht = voertuigen[index].retourneer();
+            document.getElementById("output").innerText = bericht;
+            updateTabel();
+        };
+
+        updateTabel();
+    </script>
+</body>
+</html>

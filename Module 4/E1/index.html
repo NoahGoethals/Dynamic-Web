@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Puntensysteem</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        #output { white-space: pre-line; }
+    </style>
+</head>
+<body>
+    <h1>Student Puntensysteem</h1>
+    <div id="output"></div>
+
+    <script>
+        class Student {
+            constructor(naam, vakken) {
+                this.naam = naam;
+                this.vakken = vakken.reduce((acc, vak) => (acc[vak] = [], acc), {});
+            }
+            voegPuntToe(vak, punt) {
+                if (this.vakken[vak]) this.vakken[vak].push(punt);
+            }
+            gemiddelde() {
+                let allePunten = Object.values(this.vakken).flat();
+                return allePunten.length ? (allePunten.reduce((a, b) => a + b, 0) / allePunten.length).toFixed(2) : 0;
+            }
+            toonRapport() {
+                return `${this.naam}\n` + Object.entries(this.vakken)
+                    .map(([vak, punten]) => `${vak}: ${punten.join(', ') || 'Nog geen punten'}`)
+                    .join('\n') + `\nGemiddelde: ${this.gemiddelde()}`;
+            }
+        }
+
+        let student1 = new Student("Jan", ["Wiskunde", "Engels"]);
+        let student2 = new Student("Piet", ["Geschiedenis", "Biologie"]);
+
+        student1.voegPuntToe("Wiskunde", 8);
+        student1.voegPuntToe("Engels", 7);
+        student2.voegPuntToe("Geschiedenis", 9);
+        student2.voegPuntToe("Biologie", 6);
+        student2.voegPuntToe("Biologie", 7);
+
+        document.getElementById("output").innerText = `${student1.toonRapport()}\n\n${student2.toonRapport()}`;
+    </script>
+</body>
+</html>

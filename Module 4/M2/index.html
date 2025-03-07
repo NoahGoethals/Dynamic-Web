@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bankrekening Systeem</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid black; padding: 10px; text-align: center; }
+        button { padding: 5px 10px; cursor: pointer; margin: 2px; }
+        #transactions { margin-top: 20px; white-space: pre-line; }
+    </style>
+</head>
+<body>
+    <h1>Bankrekening Systeem</h1>
+
+    <h2>Rekeningen</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Rekeningnummer</th>
+                <th>Eigenaar</th>
+                <th>Saldo</th>
+                <th>Type</th>
+                <th>Acties</th>
+            </tr>
+        </thead>
+        <tbody id="accounts"></tbody>
+    </table>
+
+    <h2>Transacties</h2>
+    <div id="transactions"></div>
+
+    <script>
+        class Bankrekening {
+            static laatsteNummer = 1000;
+            static rekeningNrGenerator = () => ++Bankrekening.laatsteNummer;
+
+            constructor(eigenaar, saldo) {
+                this.rekeningnummer = Bankrekening.rekeningNrGenerator();
+                this.eigenaar = eigenaar;
+                this._saldo = saldo < 0 ? 0 : saldo;
+            }
+
+            get rekeningnummer() { return this._rekeningnummer; }
+            get eigenaar() { return this._eigenaar; }
+            get saldo() { return this._saldo; }
+            set saldo(bedrag) { this._saldo = bedrag < 0 ? 0 : bedrag; }
+
+            storten = (bedrag) => {
+                if (bedrag > 0) {
+                    this._saldo += bedrag;
+                    return `€${bedrag} gestort op rekening ${this.rekeningnummer}. Nieuw saldo: €${this._saldo}`;
+                }
+                return `Ongeldig stortingsbedrag op rekening ${this.rekeningnummer}.`;
+            };
+
+            opnemen = (bedrag) => {
+                if (bedrag > 0 && this._saldo >= bedrag) {
+                    this._saldo -= bedrag;
+                    return `€${bedrag} opgenomen van rekening ${this.rekeningnummer}. Nieuw saldo: €${this._saldo}`;
+                }
+                return `Opname van €${bedrag} mislukt op rekening ${this.rekeningnummer}. Onvoldoende saldo.`;
+            };
+
+            get overzicht() {
+                return `Rekening: ${this.rekeningnummer} | Eigenaar: ${this.eigenaar} | Saldo: €${this.saldo}`;
+            }
+
+            static validerenTransactie = (from, to, bedrag) => {
+                return from !== to && from.saldo >= bedrag && bedrag > 0;
+            };
+        }
+
+        class Spaarrekening extends Bankrekening {
+            constructor(eigenaar, saldo, rentepercentage) {
+                super(eigenaar, saldo);
+                this.rentepercentage = rentepercentage;
+            }
+
+            renteToevoegen = () => {
+                let rente = (this._saldo * this.rentepercentage) / 100;
+                this._saldo += rente;
+                return `Rente van ${this.rentepercentage}% toegevoegd aan rekening ${this.rekeningnummer}. Nieuw saldo: €${this._saldo}`;
+            };
+        }
+
+        let rekeningen = [
+            new Bankrekening("Jan Jansen", 500),
+            new Bankrekening("Piet Pieters", 200),
+            new Spaarrekening("Lisa Smits", 1000, 2),
+        ];
+
+        const updateTabel = () => {
+            let tbody = document.getElementById("accounts");
+            tbody.innerHTML = "";
+            rekeningen.forEach((rekening, index) => {
+                let row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${rekening.rekeningnummer}</td>
+                    <td>${rekening.eigenaar}</td>
+                    <td>€${rekening.saldo}</td>
+                    <td>${rekening instanceof Spaarrekening ? "Spaarrekening" : "Bankrekening"}</td>
+                    <td>
+                        <button onclick="stort(${index}, 100)">Stort €100</button>
+                        <button onclick="neemOp(${index}, 50)">Neem €50 op</button>
+                        ${rekening instanceof Spaarrekening ? `<button onclick="renteToevoegen(${index})">Voeg Rente Toe</button>` : ""}
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        };
+
+        const logTransactie = (bericht) => {
+            let logDiv = document.getElementById("transactions");
+            logDiv.innerText = `${bericht}\n` + logDiv.innerText;
+        };
+
+        const stort = (index, bedrag) => {
+            let bericht = rekeningen[index].storten(bedrag);
+            logTransactie(bericht);
+            updateTabel();
+        };
+
+        const neemOp = (index, bedrag) => {
+            let bericht = rekeningen[index].opnemen(bedrag);
+            logTransactie(bericht);
+            updateTabel();
+        };
+
+        const renteToevoegen = (index) => {
+            let bericht = rekeningen[index].renteToevoegen();
+            logTransactie(bericht);
+            updateTabel();
+        };
+
+        updateTabel();
+    </script>
+</body>
+</html>

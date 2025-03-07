@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Cursusplatform</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .tabs { display: flex; background: #333; padding: 10px; }
+        .tab { color: white; padding: 10px 20px; cursor: pointer; }
+        .active { background: #555; }
+        .tab-content { display: none; padding: 20px; }
+        .tab-content.active { display: block; }
+        .list { margin-top: 10px; border: 1px solid black; padding: 10px; }
+        button { margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+    <h1>Online Cursusplatform</h1>
+
+    <div class="tabs">
+        <div class="tab active" data-tab="courses">Cursussen</div>
+        <div class="tab" data-tab="students">Studenten</div>
+        <div class="tab" data-tab="teachers">Docenten</div>
+        <div class="tab" data-tab="enrollments">Inschrijvingen</div>
+    </div>
+
+    <div class="tab-content active" id="courses">
+        <h2>Beschikbare Cursussen</h2>
+        <div class="list" id="course-list"></div>
+    </div>
+
+    <div class="tab-content" id="students">
+        <h2>Studenten</h2>
+        <div class="list" id="student-list"></div>
+    </div>
+
+    <div class="tab-content" id="teachers">
+        <h2>Docenten</h2>
+        <div class="list" id="teacher-list"></div>
+    </div>
+
+    <div class="tab-content" id="enrollments">
+        <h2>Inschrijvingen</h2>
+        <div class="list" id="enrollment-list"></div>
+    </div>
+
+    <script>
+        class Persoon {
+            constructor(naam, email, leeftijd) {
+                this.naam = naam;
+                this.email = this.validateEmail(email) ? email : "Ongeldig e-mailadres";
+                this.leeftijd = leeftijd > 0 ? leeftijd : 0;
+            }
+
+            validateEmail(email) {
+                return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+            }
+        }
+
+        class Student extends Persoon {
+            static studenten = [];
+            constructor(naam, email, leeftijd, studentnummer, studiejaar) {
+                super(naam, email, leeftijd);
+                this.studentnummer = studentnummer;
+                this.studiejaar = studiejaar;
+                Student.studenten.push(this);
+            }
+
+            static zoekOpStudentnummer(nummer) {
+                return Student.studenten.find(s => s.studentnummer === nummer);
+            }
+        }
+
+        class Docent extends Persoon {
+            constructor(naam, email, leeftijd, vakgebied, aanstellingsdatum) {
+                super(naam, email, leeftijd);
+                this.vakgebied = vakgebied;
+                this.aanstellingsdatum = aanstellingsdatum;
+            }
+        }
+
+        class Cursus {
+            static cursussen = [];
+            constructor(titel, beschrijving, docent, ects, maxStudenten) {
+                this.titel = titel;
+                this.beschrijving = beschrijving;
+                this.docent = docent;
+                this.ects = ects;
+                this.maxStudenten = maxStudenten > 0 ? maxStudenten : 10;
+                this.ingeschrevenStudenten = [];
+                Cursus.cursussen.push(this);
+            }
+
+            static zoekOpTitel(titel) {
+                return Cursus.cursussen.find(c => c.titel === titel);
+            }
+
+            inschrijven(student) {
+                if (this.ingeschrevenStudenten.length >= this.maxStudenten) {
+                    return `Cursus ${this.titel} zit vol!`;
+                }
+                if (this.ingeschrevenStudenten.includes(student)) {
+                    return `${student.naam} is al ingeschreven voor ${this.titel}.`;
+                }
+                this.ingeschrevenStudenten.push(student);
+                return `${student.naam} is succesvol ingeschreven voor ${this.titel}.`;
+            }
+        }
+
+        class Inschrijving {
+            static inschrijvingen = [];
+            constructor(student, cursus) {
+                this.student = student;
+                this.cursus = cursus;
+                this.datum = new Date().toLocaleDateString();
+                this.status = "Actief";
+                this.beoordeling = null;
+                Inschrijving.inschrijvingen.push(this);
+            }
+
+            voegBeoordelingToe(cijfer) {
+                this.beoordeling = cijfer;
+                return `Beoordeling ${cijfer}/10 toegevoegd voor ${this.student.naam} in ${this.cursus.titel}.`;
+            }
+
+            static controleerDubbele(student, cursus) {
+                return Inschrijving.inschrijvingen.some(insc => insc.student === student && insc.cursus === cursus);
+            }
+        }
+
+        let docent1 = new Docent("Dr. Peters", "peters@uni.com", 45, "Informatica", "2005-09-01");
+        let cursus1 = new Cursus("JavaScript Basics", "Leer de basis van JS", docent1, 6, 3);
+        let cursus2 = new Cursus("Web Development", "HTML, CSS en JS", docent1, 5, 2);
+
+        let student1 = new Student("Jan Jansen", "jan@school.com", 20, "S12345", 2);
+        let student2 = new Student("Emma Verbeek", "emma@school.com", 22, "S67890", 3);
+
+        let inschrijving1 = new Inschrijving(student1, cursus1);
+        let inschrijving2 = new Inschrijving(student2, cursus2);
+
+        function updateUI() {
+            document.getElementById("course-list").innerHTML = Cursus.cursussen.map(c => `
+                <div>${c.titel} - ${c.beschrijving} (Docent: ${c.docent.naam}) <br>
+                Studenten: ${c.ingeschrevenStudenten.length}/${c.maxStudenten}
+                <button onclick="inschrijven('${c.titel}', 'S12345')">Inschrijven</button></div>
+            `).join("<hr>");
+
+            document.getElementById("student-list").innerHTML = Student.studenten.map(s => `
+                <div>${s.naam} - ${s.email} - ${s.studentnummer}</div>
+            `).join("<hr>");
+
+            document.getElementById("teacher-list").innerHTML = `
+                <div>${docent1.naam} - ${docent1.vakgebied} - Aangesteld: ${docent1.aanstellingsdatum}</div>
+            `;
+
+            document.getElementById("enrollment-list").innerHTML = Inschrijving.inschrijvingen.map(i => `
+                <div>${i.student.naam} is ingeschreven voor ${i.cursus.titel} - Status: ${i.status}
+                <button onclick="beoordelen('${i.student.studentnummer}', '${i.cursus.titel}', 8)">Geef 8/10</button></div>
+            `).join("<hr>");
+        }
+
+        function inschrijven(cursusTitel, studentNummer) {
+            let cursus = Cursus.zoekOpTitel(cursusTitel);
+            let student = Student.zoekOpStudentnummer(studentNummer);
+            if (cursus && student) {
+                alert(cursus.inschrijven(student));
+                updateUI();
+            }
+        }
+
+        function beoordelen(studentNummer, cursusTitel, cijfer) {
+            let inschrijving = Inschrijving.inschrijvingen.find(i => 
+                i.student.studentnummer === studentNummer && i.cursus.titel === cursusTitel
+            );
+            if (inschrijving) {
+                alert(inschrijving.voegBeoordelingToe(cijfer));
+                updateUI();
+            }
+        }
+
+        updateUI();
+    </script>
+</body>
+</html>
