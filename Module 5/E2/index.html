@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tik-Counter</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            margin-top: 50px;
+        }
+        h1 {
+            font-size: 24px;
+        }
+        .counter {
+            font-size: 30px;
+            font-weight: bold;
+            margin: 10px;
+        }
+        button {
+            font-size: 20px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        .message {
+            font-size: 22px;
+            color: green;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Klik 5 keer op de knop</h1>
+    <div class="counter">0</div>
+    <button id="clickButton">Klik mij!</button>
+    <div class="message"></div>
+
+    <script>
+        function wachtOpKlik() {
+            return new Promise(resolve => {
+                let knop = document.getElementById("clickButton");
+                knop.addEventListener("click", resolve, { once: true });
+            });
+        }
+
+        async function startCounter() {
+            let teller = 0;
+            let counterDisplay = document.querySelector(".counter");
+            let message = document.querySelector(".message");
+
+            while (teller < 5) {
+                await wachtOpKlik();
+                teller++;
+                counterDisplay.textContent = teller;
+            }
+
+            message.textContent = "Gefeliciteerd! Je hebt 5 keer geklikt! 🎉";
+        }
+
+        startCounter();
+    </script>
+
+</body>
+</html>

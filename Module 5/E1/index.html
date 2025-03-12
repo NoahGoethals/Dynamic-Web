@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kleurencascade</title>
+    <style>
+        body {
+            transition: background-color 0.5s;
+            text-align: center;
+            font-family: Arial, sans-serif;
+            margin-top: 50px;
+        }
+        button {
+            font-size: 20px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <button id="startButton">Start kleurencascade</button>
+
+    <script>
+        document.getElementById("startButton").addEventListener("click", function() {
+            setTimeout(() => {
+                document.body.style.backgroundColor = "red";
+                setTimeout(() => {
+                    document.body.style.backgroundColor = "green";
+                    setTimeout(() => {
+                        document.body.style.backgroundColor = "blue";
+                    }, 1000);
+                }, 1000);
+            }, 1000);
+        });
+    </script>
+
+</body>
+</html>

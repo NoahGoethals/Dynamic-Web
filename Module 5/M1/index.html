@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Loader</title>
+    <style>
+        .gallery { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 10px; 
+        }
+        .gallery img { 
+            width: 200px; 
+            height: 200px; 
+            object-fit: cover; 
+            border: 2px solid #ddd;
+            border-radius: 5px;
+        }
+        .progress {
+            width: 100%;
+            background-color: #ddd;
+            margin: 10px 0;
+        }
+        .progress-bar {
+            height: 20px;
+            background-color: #4CAF50;
+            text-align: center;
+            line-height: 20px;
+            color: white;
+            width: 0%;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Afbeeldingen Galerij</h1>
+    <div class="progress">
+        <div class="progress-bar">0%</div>
+    </div>
+    <button id="loadButton">Laad afbeeldingen</button>
+    <div class="gallery"></div>
+
+    <script>
+        function laadAfbeelding(src) {
+            return new Promise((resolve, reject) => {
+                let img = new Image();
+                img.src = src;
+                img.onload = () => resolve(img);
+                img.onerror = () => reject(`Fout bij laden: ${src}`);
+            });
+        }
+
+        function updateProgress(percentage) {
+            let progressBar = document.querySelector(".progress-bar");
+            progressBar.style.width = percentage + "%";
+            progressBar.textContent = percentage + "%";
+        }
+
+        document.getElementById("loadButton").addEventListener("click", async function() {
+            let gallery = document.querySelector(".gallery");
+            gallery.innerHTML = "";
+            updateProgress(0);
+
+            let afbeeldingen = [
+                "https://via.placeholder.com/200/FF5733",
+                "https://via.placeholder.com/200/33FF57",
+                "https://via.placeholder.com/200/3357FF"
+            ];
+
+            for (let i = 0; i < afbeeldingen.length; i++) {
+                try {
+                    let img = await laadAfbeelding(afbeeldingen[i]);
+                    gallery.appendChild(img);
+                    updateProgress(((i + 1) / afbeeldingen.length) * 100);
+                } catch (error) {
+                    console.error(error);
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>

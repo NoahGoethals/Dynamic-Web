@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promise Timer</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            margin-top: 50px;
+        }
+        .controls {
+            margin-bottom: 20px;
+        }
+        .timer {
+            font-size: 40px;
+            font-weight: bold;
+            margin: 10px;
+        }
+        .message {
+            font-size: 22px;
+            color: green;
+            margin-top: 10px;
+        }
+        button {
+            font-size: 16px;
+            padding: 8px 15px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Promise Timer</h1>
+
+    <div class="controls">
+        <input type="number" id="seconds" min="1" max="60" value="10" step="1">
+        <button id="startButton">Start Timer</button>
+        <button id="cancelButton" disabled>Annuleer</button>
+    </div>
+
+    <div class="timer" id="timerDisplay">0</div>
+
+    <div id="message" class="message" style="display: none;"></div>
+
+    <script>
+        let cancelTimer = false;
+
+        function startCountdown(seconds) {
+            return new Promise((resolve, reject) => {
+                let display = document.getElementById("timerDisplay");
+                let cancelButton = document.getElementById("cancelButton");
+                cancelTimer = false;
+                cancelButton.disabled = false;
+
+                function updateTimer(sec) {
+                    if (cancelTimer) {
+                        reject("Timer geannuleerd!");
+                        return;
+                    }
+                    if (sec >= 0) {
+                        display.textContent = sec;
+                        setTimeout(() => updateTimer(sec - 1), 1000);
+                    } else {
+                        resolve("Tijd is verstreken! ⏳");
+                    }
+                }
+
+                updateTimer(seconds);
+            });
+        }
+
+        document.getElementById("startButton").addEventListener("click", function() {
+            let seconds = parseInt(document.getElementById("seconds").value);
+            let message = document.getElementById("message");
+
+            message.style.display = "none";
+            message.textContent = "";
+
+            startCountdown(seconds)
+                .then(msg => {
+                    message.textContent = msg;
+                    message.style.color = "green";
+                })
+                .catch(error => {
+                    message.textContent = error;
+                    message.style.color = "red";
+                })
+                .finally(() => {
+                    message.style.display = "block";
+                    document.getElementById("cancelButton").disabled = true;
+                });
+        });
+
+        document.getElementById("cancelButton").addEventListener("click", function() {
+            cancelTimer = true;
+        });
+    </script>
+
+</body>
+</html>
